@@ -5,40 +5,84 @@ import s1_0 from './assets/tile assets/s1_0.png';
 import s1_1 from './assets/tile assets/s1_1.png';
 import s1_2 from './assets/tile assets/s1_2.png';
 import s1_3 from './assets/tile assets/s1_3.png';
+import s1_4 from './assets/tile assets/s1_4.png';
+import s1_5 from './assets/tile assets/s1_5.png';
+import s1_6 from './assets/tile assets/s1_6.png';
 
 import s2_0 from './assets/tile assets/s2_0.png';
 import s2_1 from './assets/tile assets/s2_1.png';
 import s2_2 from './assets/tile assets/s2_2.png';
 import s2_3 from './assets/tile assets/s2_3.png';
+import s2_4 from './assets/tile assets/s2_4.png';
 
 import s3_0 from './assets/tile assets/s3_0.png';
 import s3_1 from './assets/tile assets/s3_1.png';
 import s3_2 from './assets/tile assets/s3_2.png';
 import s3_3 from './assets/tile assets/s3_3.png';
+import s3_4 from './assets/tile assets/s3_4.png';
+import s3_5 from './assets/tile assets/s3_5.png';
+import s3_6 from './assets/tile assets/s3_6.png';
 
 import s4_0 from './assets/tile assets/s4_0.png';
 import s4_1 from './assets/tile assets/s4_1.png';
 import s4_2 from './assets/tile assets/s4_2.png';
 import s4_3 from './assets/tile assets/s4_3.png';
+import s4_4 from './assets/tile assets/s4_4.png';
+import s4_5 from './assets/tile assets/s4_5.png';
+import s4_6 from './assets/tile assets/s4_6.png';
+import s4_7 from './assets/tile assets/s4_7.png';
+import s4_8 from './assets/tile assets/s4_8.png';
 
-const section1Options = [s1_0, s1_1, s1_2, s1_3];
-const section2Options = [s2_0, s2_1, s2_2, s2_3];
-const section3Options = [s3_0, s3_1, s3_2, s3_3];
-const section4Options = [s4_0, s4_1, s4_2, s4_3];
+const section1Options = [s1_0, s1_1, s1_2, s1_3, s1_4, s1_5, s1_6];
+const section2Options = [s2_0, s2_1, s2_2, s2_3, s2_4];
+const section3Options = [s3_0, s3_1, s3_2, s3_3, s3_4, s3_5, s3_6];
+const section4Options = [s4_0, s4_1, s4_2, s4_3, s4_4, s4_5, s4_6, s4_7, s4_8];
+
+function LayerImage({
+  src,
+  size,
+}: {
+  src: string;
+  size: number;
+}) {
+  return (
+    <img
+      src={src}
+      alt=""
+      style={{
+        position: 'absolute',
+        inset: 0,
+        width: `${size}px`,
+        height: `${size}px`,
+        objectFit: 'cover',
+        pointerEvents: 'none',
+        userSelect: 'none',
+      }}
+    />
+  );
+}
 
 export default function App() {
   const [section1, setSection1] = React.useState(0);
   const [section2, setSection2] = React.useState(0);
   const [section3, setSection3] = React.useState(0);
   const [section4, setSection4] = React.useState(0);
+
   const [isDownloading, setIsDownloading] = React.useState(false);
 
   const tileRef = React.useRef<HTMLDivElement>(null);
 
-  const nextSection1 = () => setSection1((prev) => (prev + 1) % 4);
-  const nextSection2 = () => setSection2((prev) => (prev + 1) % 4);
-  const nextSection3 = () => setSection3((prev) => (prev + 1) % 4);
-  const nextSection4 = () => setSection4((prev) => (prev + 1) % 4);
+  const nextSection1 = () =>
+    setSection1((prev) => (prev + 1) % section1Options.length);
+
+  const nextSection2 = () =>
+    setSection2((prev) => (prev + 1) % section2Options.length);
+
+  const nextSection3 = () =>
+    setSection3((prev) => (prev + 1) % section3Options.length);
+
+  const nextSection4 = () =>
+    setSection4((prev) => (prev + 1) % section4Options.length);
 
   const resetTile = () => {
     setSection1(0);
@@ -48,47 +92,41 @@ export default function App() {
   };
 
   const submitTile = async () => {
-  if (!tileRef.current) return;
+    if (!tileRef.current) return;
 
-  const tileData = {
-    section1,
-    section2,
-    section3,
-    section4,
-  };
+    const tileData = {
+      section1,
+      section2,
+      section3,
+      section4,
+    };
 
-  try {
-    const canvas = await html2canvas(tileRef.current, {
-      backgroundColor: null,
-      scale: 2,
-    });
+    try {
+      const canvas = await html2canvas(tileRef.current, {
+        backgroundColor: null,
+        scale: 2,
+        useCORS: true,
+      });
 
-    const imageData = canvas.toDataURL('image/png');
+      const imageData = canvas.toDataURL('image/png');
 
-    const response = await fetch('https://ecologically-stenosed-hana.ngrok-free.dev/submit-tile', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        tileData,
-        imageData,
-      }),
-    });
+      const response = await fetch(
+        'https://ecologically-stenosed-hana.ngrok-free.dev/submit-tile',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tileData, imageData }),
+        }
+      );
 
-    if (!response.ok) {
-      throw new Error('Failed to submit tile');
+      if (!response.ok) throw new Error('Failed to submit tile');
+
+      alert('Tile submitted successfully!');
+    } catch (error) {
+      console.error('Submit error:', error);
+      alert('Submit failed.');
     }
-
-    const result = await response.json();
-    console.log('Server response:', result);
-
-    alert('Tile submitted successfully!');
-  } catch (error) {
-    console.error('Submit error:', error);
-    alert('Submit failed.');
-  }
-};
+  };
 
   const downloadTile = async () => {
     if (!tileRef.current) return;
@@ -99,6 +137,7 @@ export default function App() {
       const canvas = await html2canvas(tileRef.current, {
         backgroundColor: null,
         scale: 2,
+        useCORS: true,
       });
 
       const link = document.createElement('a');
@@ -118,32 +157,39 @@ export default function App() {
       <div style={containerStyle}>
         <h1 style={titleStyle}>Peranakan Tile Designer</h1>
         <p style={subtitleStyle}>Create your own heritage tile design</p>
+
         <div ref={tileRef} style={tileWrapperStyle}>
-          <img src={section1Options[section1]} alt="Section 1" style={tileLayerStyle} />
-          <img src={section2Options[section2]} alt="Section 2" style={tileLayerStyle} />
-          <img src={section3Options[section3]} alt="Section 3" style={tileLayerStyle} />
-          <img src={section4Options[section4]} alt="Section 4" style={tileLayerStyle} />
+          <LayerImage src={section1Options[section1]} size={320} />
+          <LayerImage src={section2Options[section2]} size={320} />
+          <LayerImage src={section3Options[section3]} size={320} />
+          <LayerImage src={section4Options[section4]} size={320} />
         </div>
 
         <div style={buttonGroupStyle}>
-          <button onClick={nextSection1} style={buttonStyle}>Next Section 1</button>
-          <button onClick={nextSection2} style={buttonStyle}>Next Section 2</button>
-          <button onClick={nextSection3} style={buttonStyle}>Next Section 3</button>
-          <button onClick={nextSection4} style={buttonStyle}>Next Section 4</button>
+          <button onClick={nextSection1} style={buttonStyle}>
+            Next Section 1
+          </button>
+          <button onClick={nextSection2} style={buttonStyle}>
+            Next Section 2
+          </button>
+          <button onClick={nextSection3} style={buttonStyle}>
+            Next Section 3
+          </button>
+          <button onClick={nextSection4} style={buttonStyle}>
+            Next Section 4
+          </button>
         </div>
 
         <div style={buttonGroupStyle}>
-        <button onClick={downloadTile} style={buttonStyle}>
-        {isDownloading ? 'Downloading...' : 'Download Tile'}
-        </button>
-
-         <button onClick={submitTile} style={buttonStyle}>
-          Submit Tile
-         </button>
-
-        <button onClick={resetTile} style={secondaryButtonStyle}>
-         Reset Tile
-         </button>
+          <button onClick={downloadTile} style={buttonStyle}>
+            {isDownloading ? 'Downloading...' : 'Download Tile'}
+          </button>
+          <button onClick={submitTile} style={buttonStyle}>
+            Submit Tile
+          </button>
+          <button onClick={resetTile} style={secondaryButtonStyle}>
+            Reset Tile
+          </button>
         </div>
       </div>
     </div>
@@ -185,13 +231,6 @@ const tileWrapperStyle: React.CSSProperties = {
   overflow: 'hidden',
 };
 
-const tileLayerStyle: React.CSSProperties = {
-  position: 'absolute',
-  inset: 0,
-  width: '100%',
-  height: '100%',
-};
-
 const buttonGroupStyle: React.CSSProperties = {
   display: 'grid',
   gap: '12px',
@@ -219,4 +258,3 @@ const secondaryButtonStyle: React.CSSProperties = {
   fontWeight: 600,
   cursor: 'pointer',
 };
-
