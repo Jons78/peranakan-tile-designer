@@ -65,7 +65,7 @@ export default function App() {
 
     const imageData = canvas.toDataURL('image/png');
 
-    const response = await fetch('http://localhost:3000/submit-tile', {
+    const response = await fetch('https://ecologically-stenosed-hana.ngrok-free.dev/submit-tile', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
